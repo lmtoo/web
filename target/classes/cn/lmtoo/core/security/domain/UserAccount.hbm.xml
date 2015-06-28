@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="cn.lmtoo.core.security.domain">
+	<class name="UserAccount" table="t_user">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<property column="username" name="username" />
+		<property access="field" column="password" name="password" />
+		<property column="locked" name="locked" />
+		<property column="credentialsExpired" name="credentialsExpired" />
+		<property access="field" column="salt" name="salt" />
+		<set name="roles" table="t_user_role" access="field">
+			<key column="user_id" />
+			<many-to-many class="Role" column="role_id" />
+		</set>
+		<many-to-one name="group" class="Group" column="group_id" />
+	</class>
+</hibernate-mapping>

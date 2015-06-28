@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+	default-init-method="init" default-destroy-method="destroy">
+
+	<bean id="hibernateProperties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:hibernate.properties" />
+	</bean>
+
+	<bean id="userAccountDao"
+		class="cn.lmtoo.core.security.infrastructure.repository.AccountRepository"></bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+		p:dataSource-ref="dataSource" p:hibernateProperties-ref="hibernateProperties">
+		<property name="mappingLocations">
+			<list>
+				<value>classpath:cn/lmtoo/core/security/domain/UserAccount.hbm.xml
+				</value>
+				<value>classpath:cn/lmtoo/core/security/domain/Group.hbm.xml</value>
+				<value>classpath:cn/lmtoo/core/security/domain/Role.hbm.xml</value>
+				<value>classpath:cn/lmtoo/core/security/domain/Module.hbm.xml
+				</value>
+				<value>classpath:cn/lmtoo/core/security/domain/ResourcePermission.hbm.xml
+				</value>
+			</list>
+		</property>
+	</bean>
+</beans>

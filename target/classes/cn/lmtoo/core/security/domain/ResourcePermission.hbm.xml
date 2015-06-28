@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="cn.lmtoo.core.security.domain">
+	<class name="ResourcePermission" table="t_permisssion">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<many-to-one name="resource" column="resource_id" class="Module" />
+		<property name="actionStr" column="actions" access="property" not-null="false"/>
+		<property name="targetStr" column="targets" access="property" not-null="false"/>
+	</class>
+</hibernate-mapping>

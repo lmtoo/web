@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+	default-init-method="init" default-destroy-method="destroy">
+
+	<bean id="credentialsMatcher" class="org.apache.shiro.authc.credential.PasswordMatcher"
+		p:passwordService-ref="passwordService" />
+
+	<bean id="userAcountRealm" class="cn.lmtoo.ui.web.realm.UserAccountRealm"
+		p:credentialsMatcher-ref="credentialsMatcher" p:userAccountDao-ref="userAccountDao" />
+
+	<bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager" />
+
+	<bean id="passwordService"
+		class="org.apache.shiro.authc.credential.DefaultPasswordService" />
+
+	<bean id="sessionIdGenerator"
+		class="org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator" />
+
+	<bean id="sessionDAO"
+		class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO"
+		p:sessionIdGenerator-ref="sessionIdGenerator">
+	</bean>
+
+	<bean id="sessionManager"
+		class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager"
+		p:sessionDAO-ref="sessionDAO" />
+
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager"
+		p:sessionManager-ref="sessionManager" p:cacheManager-ref="cacheManager"
+		p:realm-ref="userAcountRealm" />
+
+	<bean id="openSessionFilter"
+		class="org.springframework.orm.hibernate4.support.OpenSessionInViewFilter" />
+
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean"
+		p:securityManager-ref="securityManager" p:loginUrl="/login/index"
+		p:successUrl="/home/index" p:unauthorizedUrl="/unauthorized.jsp">
+		<property name="filters">
+			<map>
+				<entry key="session" value-ref="openSessionFilter" />
+				<entry key="authc" value-ref="authcFilter" />
+				<entry key="user" value-ref="userFilter" />
+				<entry key="ssl" value-ref="sslFilter" />
+			</map>
+		</property>
+		<property name="filterChainDefinitions">
+			<value>
+				/static/**= anon
+				/snippet/**=anon
+				/controller/**=anon
+				/rest/**=anon
+				/settings/**=anon
+				/logout = logout
+				/unauthorized.jsp=anon
+				/index.jsp =session, anon
+				/register/**=session,anon
+				/login/**=ssl,session,authc
+				/**
+				=session,user
+			</value>
+		</property>
+	</bean>
+
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+	<bean
+		class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+		depends-on="lifecycleBeanPostProcessor" />
+	<bean
+		class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+
+	<bean id="authenticationSettingHolder"
+		class="cn.lmtoo.core.security.extend.web.filter.authc.AuthenticationSettingHolder" />
+
+	<bean id="userFilter"
+		class="cn.lmtoo.core.security.extend.web.filter.authc.MultiSystemUserFilter">
+		<property name="settingHolder" ref="authenticationSettingHolder" />
+	</bean>
+	<bean id="authcFilter"
+		class="cn.lmtoo.core.security.extend.web.filter.authc.MultiSystemAuthenticationFilter">
+		<property name="settingHolder" ref="authenticationSettingHolder" />
+	</bean>
+	<bean id="sslFilter" class="org.apache.shiro.web.filter.authz.SslFilter">
+		<property name="port" value="8443" />
+	</bean>
+</beans>

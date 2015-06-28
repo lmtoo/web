@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="cn.lmtoo.core.security.domain">
+	<class name="Module" table="t_module">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<property column="name" name="name" />
+		<property column="title" name="title" />
+		<property column="link" name="link" />
+		<many-to-one name="parent" column="parent_id" class="Module" />
+		<property name="actionStr" column="actions" not-null="false" />
+		<set name="children" cascade="save-update" access="field">
+			<key column="parent_id" />
+			<one-to-many class="Module" />
+		</set>
+	</class>
+</hibernate-mapping>
